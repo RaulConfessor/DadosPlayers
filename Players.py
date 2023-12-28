@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 import pandas as pd
@@ -10,14 +10,14 @@ import matplotlib.pyplot as plt
 get_ipython().run_line_magic('matplotlib', 'inline')
 
 
-# In[3]:
+# In[2]:
 
 
 df =  pd.read_csv('DataSets/players_20.csv')
 df
 
 
-# In[4]:
+# In[3]:
 
 
 #Removendo colunas desnecessárias 
@@ -26,14 +26,14 @@ df = df.drop(['player_url', 'dob'], axis=1)
 df.head()
 
 
-# In[5]:
+# In[4]:
 
 
 lista = list(df.columns)
 lista
 
 
-# In[6]:
+# In[5]:
 
 
 #Alterando o posicionamento da coluna Overall e Potential
@@ -48,7 +48,7 @@ else:
     print('A coluna "overall" não está presente no DataFrame.')
 
 
-# In[7]:
+# In[6]:
 
 
 if 'potential'in lista and 'potential' != lista[5]:
@@ -62,7 +62,7 @@ else:
     print('A coluna "overall" não está presente no DataFrame.')
 
 
-# In[43]:
+# In[7]:
 
 
 #Ordenando por potencial
@@ -73,7 +73,7 @@ potential = potential.sort_values(by='potential',ascending=False)
 potential.head(20)
 
 
-# In[44]:
+# In[8]:
 
 
 brasil = df[df['nationality'] == 'Brazil']
@@ -81,7 +81,7 @@ brasilTop = brasil.head(10)
 brasilTop
 
 
-# In[ ]:
+# In[9]:
 
 
 brasil = df[df['nationality'] == 'Brazil']
@@ -89,17 +89,20 @@ brasilTop = brasil.head(10)
 brasilTop
 
 
-# In[45]:
+# In[12]:
 
 
 brOld = brasil[brasil['age']>25]
 brOld = brOld.head(15)
 
+brYoung = brasil[brasil['age'] <=25]
+brYoung = brYoung.sort_values(by='potential', ascending=False).head(15)
 
-# In[70]:
+
+# In[13]:
 
 
-#Comparação entre os principais jogadores dos Brasil x os mais promissores
+#Comparação entre os principais jogadores dos Brasil x Promissores
 
 fig, ax = plt.subplots(1, 2)
 fig.set_size_inches(15, 6, forward=True)
@@ -141,7 +144,7 @@ for i, v in enumerate(brYoung['potential']):
     ax[1].text(x2[i], v + 0.02, str(v), ha='center', va='bottom')
 
 
-# In[49]:
+# In[14]:
 
 
 plt.figure(figsize=(8, 8))
@@ -149,19 +152,7 @@ nation_counts = df['nationality'].value_counts().head(10)
 size = nation_counts.values
 labels =  nation_counts.index
 plt.pie(size, labels=labels, autopct='%1.1f%%', startangle=90)
-plt.title('Principais nacionalidades')
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+plt.title('Principais Nacionalidades')
 
 
 # In[ ]:
