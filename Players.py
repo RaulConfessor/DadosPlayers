@@ -1,23 +1,27 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[83]:
 
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 get_ipython().run_line_magic('matplotlib', 'inline')
+import pyodbc
+import pymssql as sql
+import warnings
+warnings.filterwarnings("ignore")
 
 
-# In[2]:
+# In[84]:
 
 
 df =  pd.read_csv('DataSets/players_20.csv')
 df
 
 
-# In[3]:
+# In[85]:
 
 
 #Removendo colunas desnecessárias 
@@ -26,14 +30,14 @@ df = df.drop(['player_url', 'dob'], axis=1)
 df.head()
 
 
-# In[4]:
+# In[86]:
 
 
 lista = list(df.columns)
 lista
 
 
-# In[5]:
+# In[87]:
 
 
 #Alterando o posicionamento da coluna Overall e Potential
@@ -48,7 +52,7 @@ else:
     print('A coluna "overall" não está presente no DataFrame.')
 
 
-# In[6]:
+# In[88]:
 
 
 if 'potential'in lista and 'potential' != lista[5]:
@@ -62,7 +66,7 @@ else:
     print('A coluna "overall" não está presente no DataFrame.')
 
 
-# In[7]:
+# In[89]:
 
 
 #Ordenando por potencial
@@ -73,7 +77,7 @@ potential = potential.sort_values(by='potential',ascending=False)
 potential.head(20)
 
 
-# In[8]:
+# In[90]:
 
 
 brasil = df[df['nationality'] == 'Brazil']
@@ -81,7 +85,7 @@ brasilTop = brasil.head(10)
 brasilTop
 
 
-# In[9]:
+# In[91]:
 
 
 brasil = df[df['nationality'] == 'Brazil']
@@ -89,7 +93,7 @@ brasilTop = brasil.head(10)
 brasilTop
 
 
-# In[12]:
+# In[92]:
 
 
 brOld = brasil[brasil['age']>25]
@@ -99,7 +103,7 @@ brYoung = brasil[brasil['age'] <=25]
 brYoung = brYoung.sort_values(by='potential', ascending=False).head(15)
 
 
-# In[13]:
+# In[93]:
 
 
 #Comparação entre os principais jogadores dos Brasil x Promissores
@@ -144,7 +148,7 @@ for i, v in enumerate(brYoung['potential']):
     ax[1].text(x2[i], v + 0.02, str(v), ha='center', va='bottom')
 
 
-# In[14]:
+# In[94]:
 
 
 plt.figure(figsize=(8, 8))
@@ -153,6 +157,44 @@ size = nation_counts.values
 labels =  nation_counts.index
 plt.pie(size, labels=labels, autopct='%1.1f%%', startangle=90)
 plt.title('Principais Nacionalidades')
+
+
+# In[95]:
+
+
+df.head()
+
+
+# In[107]:
+
+
+connect = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=DESKTOP-1VPOTLF\SQLEXPRESS;DATABASE=FIFA;Trusted_Connection=yes;')
+print('BANCO CONECTADO')
+
+
+# In[108]:
+
+
+cursor = connect.cursor()
+
+InsertQuery = "INSERT INTO PLAYERS (ID_PLAYERS, SHORT_NAME, LONG_NAME, AGE, OVERALL, POTENTIAL, HEIGHT_CM, WEIGHT_KG, NATIONALITY, CLUB, VALUE_EUR, WAGE_EUR, POSITIONS, PREFERRED_FOOT, INTERNAT_REPUTION) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+for index, row in df.iterrows():
+    DataTuple = (
+        row['sofifa_id'], row['short_name'], row['long_name'], row['age'], row['overall'], row['potential'], row['height_cm'],
+        row['weight_kg'], row['nationality'], row['club'], row['value_eur'], row['wage_eur'], row['player_positions'], row['preferred_foot'],
+        row['international_reputation']
+    )
+    cursor.execute(InsertQuery, DataTuple)
+    
+    connect.commit()
+
+
+# In[105]:
+
+
+cursor.close()
+connect.close()
 
 
 # In[ ]:
